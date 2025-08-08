@@ -1,5 +1,6 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import * as geoip from 'geoip-lite';
 
 @Controller('ip')
 export class IpController {
@@ -8,6 +9,13 @@ export class IpController {
     const ip =
       request.headers['x-forwarded-for']?.toString().split(',')[0] ||
       request.ip;
-    return { ip };
+
+    const geo = geoip.lookup(ip);
+
+    return {
+      ip,
+      country: geo?.country || 'Unknown',
+      city: geo?.city || 'Unknown',
+    };
   }
 }
